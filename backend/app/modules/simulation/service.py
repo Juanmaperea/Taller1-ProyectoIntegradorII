@@ -1,3 +1,5 @@
+# modules/simulation/service.py
+
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.expense import Expense
@@ -7,14 +9,19 @@ from app.modules.simulation.schemas import (
 )
 
 
-def run_simulation(category: str, percentage: float, db: Session) -> SimulationResponse:
+def run_simulation(category: str, percentage: float, user_id: int, db: Session) -> SimulationResponse:
 
-    # Total general actual
-    original_total = db.query(func.sum(Expense.amount)).scalar() or 0
+    # Total general del usuario
+    original_total = (
+        db.query(func.sum(Expense.amount))
+        .filter(Expense.user_id == user_id)
+        .scalar()
+    ) or 0
 
-    # Totales por categoría
+    # Totales por categoría del usuario
     category_data = (
         db.query(Expense.category, func.sum(Expense.amount))
+        .filter(Expense.user_id == user_id)
         .group_by(Expense.category)
         .all()
     )

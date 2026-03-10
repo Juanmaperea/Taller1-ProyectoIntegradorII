@@ -1,3 +1,4 @@
+#auth/service.py
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.models.user import User
@@ -28,6 +29,6 @@ def login_user(email: str, password: str, db: Session):
     if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-    token = create_access_token({"sub": user.email})
+    token = create_access_token({"sub": str(user.id)})
 
     return {"access_token": token}

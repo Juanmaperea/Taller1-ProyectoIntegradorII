@@ -1,9 +1,10 @@
+#modules/ingestion/service.py
 from sqlalchemy.orm import Session
 from app.models.expense import Expense
 from app.utils.excel_parser import parse_excel
 from datetime import datetime
 
-def process_excel(file, db: Session):
+def process_excel(file, db: Session, user_id: int):
 
     df = parse_excel(file)
 
@@ -15,7 +16,8 @@ def process_excel(file, db: Session):
             category=row.get("category"),
             amount=float(row["amount"]),
             date=row["date"] if isinstance(row["date"], datetime)
-            else datetime.strptime(str(row["date"]), "%Y-%m-%d")
+            else datetime.strptime(str(row["date"]), "%Y-%m-%d"),
+            user_id=user_id
         )
 
         db.add(expense)
